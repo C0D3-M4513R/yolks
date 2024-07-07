@@ -4,6 +4,7 @@ LABEL       author="Michael Parker" maintainer="parker@pterodactyl.io"
 
 RUN         apt update -y \
             && apt install -y \
+                btrfs-progs \
                 curl \
                 lsof \
                 ca-certificates \
