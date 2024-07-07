@@ -5,8 +5,10 @@ LABEL       author="Michael Parker" maintainer="parker@pterodactyl.io"
 LABEL       org.opencontainers.image.source="https://github.com/pterodactyl/yolks"
 LABEL       org.opencontainers.image.licenses=MIT
 
+
 RUN         apt update -y \
             && apt install -y \
+                btrfs-progs \
                 curl \
                 lsof \
                 ca-certificates \
@@ -22,7 +24,6 @@ RUN         apt update -y \
 				zip \
 				unzip \
                 jq
-
 
 ## Setup user and working directory
 RUN         useradd -m -d /home/container -s /bin/bash container
