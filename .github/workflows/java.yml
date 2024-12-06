@@ -20,6 +20,7 @@ jobs:
       matrix:
         tag:
           - 8
+          - 8-graalvm
 #          - 8j9
           - 11
 #          - 11j9
