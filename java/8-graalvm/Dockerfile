@@ -29,8 +29,8 @@ LABEL       org.opencontainers.image.licenses=MIT
 
 RUN 				apt-get update -y \
 						&& apt-get install -y btrfs-progs lsof curl ca-certificates openssl git tar sqlite3 fontconfig libfreetype6 tzdata iproute2 libstdc++6 && rm -rf /var/lib/apt/lists/* \
-						&& curl -o /graalvm.tar.gz -L https://github.com/graalvm/graalvm-ce-builds/releases/download/vm-21.2.0/graalvm-ce-java8-linux-amd64-21.2.0.tar.gz \
-						&& echo "0ea16ff2fe178800195e2918ee7ceee352601d4161a17eac67979febaaecfe05 graalvm.tar.gz" | sha256sum -c - \
+						&& curl -o /graalvm.tar.gz -L https://c0d3m4513r.com/files/f763015b-93fd-425a-b9f7-9461d9ff5249/graalvm-ee-java8-linux-amd64-21.3.12.tar.gz \
+						&& echo "dc08abee0baa638ea2f9c7dbb5703a5bd318ff1ddd2f8638a7ffd14592ba1a6a graalvm.tar.gz" | sha256sum -c - \
 						&& mkdir /graalvm && tar -xzf /graalvm.tar.gz -C /graalvm --strip-components=1 \
 						&& rm /graalvm.tar.gz \
 						&& chmod -R 755 /graalvm \
