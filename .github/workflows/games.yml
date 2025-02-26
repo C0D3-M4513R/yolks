@@ -9,8 +9,50 @@ on:
     paths:
       - games/**
 jobs:
-  push:
+  push-amd64:
     name: "games:${{ matrix.game }}"
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        game:
+          - source
+          - rust
+    steps:
+      - uses: actions/checkout@v3
+      - uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: "c0d3-m4513r"
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push
+        if: ${{ hashFiles(format('./games/{0}/Dockerfile', matrix.game )) != '' }}
+        run: |
+          docker build -t ghcr.io/c0d3-m4513r/games:${{ matrix.game }}-amd64 -f ./games/${{ matrix.game }}/Dockerfile ./games/${{ matrix.game }}
+          docker push ghcr.io/c0d3-m4513r/games:${{ matrix.game }}-amd64
+  push-arm64:
+    name: "games:${{ matrix.game }}"
+    runs-on: ubuntu-24.04-arm
+    strategy:
+      fail-fast: false
+      matrix:
+        game:
+          - source
+          - rust
+    steps:
+      - uses: actions/checkout@v3
+      - uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: "c0d3-m4513r"
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push
+        if: ${{ hashFiles(format('./games/{0}/Dockerfile.aarch64', matrix.game )) != '' }}
+        run: |
+          docker build -t ghcr.io/c0d3-m4513r/games:${{ matrix.game }}-arm64 -f ./games/${{ matrix.game }}/Dockerfile.aarch64 ./games/${{ matrix.game }}
+          docker push ghcr.io/c0d3-m4513r/games:${{ matrix.game }}-arm64
+  push:
+    needs: [push-arm64, push-amd64]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -20,19 +62,33 @@ jobs:
           - rust
     steps:
       - uses: actions/checkout@v3
-      - uses: docker/setup-buildx-action@v2
-        with:
-          buildkitd-flags: --debug
       - uses: docker/login-action@v2
         with:
           registry: ghcr.io
           username: "c0d3-m4513r"
           password: ${{ secrets.GITHUB_TOKEN }}
-      - uses: docker/build-push-action@v4
-        with:
-          context: ./games/${{ matrix.game }}
-          file: ./games/${{ matrix.game }}/Dockerfile
-          platforms: linux/amd64
-          push: true
-          tags: |
-            ghcr.io/c0d3-m4513r/games:${{ matrix.game }}
+      - name: Push multi-platform manifest
+        run: |
+          manifest_create="docker manifest create ghcr.io/c0d3-m4513r/games:${{ matrix.game }}"
+          containers=
+          if [ -f ./games/${{ matrix.game }}/Dockerfile ]
+          then
+            manifest_create+=" ghcr.io/c0d3-m4513r/games:${{ matrix.game }}-amd64"
+            containers+=("docker manifest annotate ghcr.io/c0d3-m4513r/games:${{ matrix.game }} ghcr.io/c0d3-m4513r/games:${{ matrix.game }}-amd64 --arch amd64")
+          fi
+          
+          if [ -f ./games/${{ matrix.game }}/Dockerfile.aarch64 ]
+          then
+            manifest_create+=" ghcr.io/c0d3-m4513r/games:${{ matrix.game }}-arm64"
+            containers+=("docker manifest annotate ghcr.io/c0d3-m4513r/games:${{ matrix.game }} ghcr.io/c0d3-m4513r/games:${{ matrix.game }}-arm64 --arch arm64")
+          fi
+          
+          echo ${manifest_create}
+          ${manifest_create}
+          for container in "${containers[@]}"
+          do
+            echo ${container}
+            ${container}
+          done
+          
+          docker manifest push ghcr.io/c0d3-m4513r/games:${{ matrix.game }}

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2021 Pterodactyl
+# Copyright (c) 2021 Matthew Penner
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,29 +20,23 @@
 # SOFTWARE.
 #
 
-FROM 		--platform=$TARGETOS/$TARGETARCH node:22-slim
+FROM        --platform=$TARGETOS/$TARGETARCH debian:stable-slim
 
-LABEL       author="Isaac A." maintainer="isaac@isaacs.site"
+LABEL       author="Matthew Penner" maintainer="matthew@pterodactyl.io"
 
 LABEL       org.opencontainers.image.source="https://github.com/pterodactyl/yolks"
 LABEL       org.opencontainers.image.licenses=MIT
 
 ENV         DEBIAN_FRONTEND=noninteractive
 
-RUN			dpkg --add-architecture i386 \
-			&& apt update \
-			&& apt upgrade -y \
-			&& apt install -y lib32gcc-s1 lib32stdc++6 unzip curl iproute2 tzdata libgdiplus libsdl2-2.0-0:i386 \
-			&& mkdir /wrapper \
-			&& npm install --prefix /wrapper ws \
-			&& useradd -d /home/container -m container
+RUN         apt update \
+		&& apt upgrade -y \
+		&& apt install -y tar curl gcc g++ libgcc1 libcurl4-gnutls-dev libssl3 libcurl4 libtinfo6 libncurses5 libcurl3-gnutls libsdl2-2.0-0 iproute2 gdb libsdl1.2debian libfontconfig1 telnet net-tools netcat-openbsd tzdata \
+		&& useradd -m -d /home/container container
 
-USER 		container
-ENV  		USER=container HOME=/home/container
+USER        container
+ENV         USER=container HOME=/home/container
+WORKDIR     /home/container
 
-WORKDIR 	/home/container
-
-COPY 		./entrypoint.sh /entrypoint.sh
-COPY 		./wrapper.js /wrapper/wrapper.js
-
-CMD			[ "/bin/bash", "/entrypoint.sh" ]
+COPY        ./entrypoint.sh /entrypoint.sh
+CMD         [ "/bin/bash", "/entrypoint.sh" ]
