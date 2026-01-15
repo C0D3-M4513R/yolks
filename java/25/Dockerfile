@@ -7,6 +7,7 @@ LABEL       org.opencontainers.image.licenses=MIT
 
 RUN         apt update -y \
             && apt install -y \
+                btrfs-progs \
                 curl \
                 lsof \
                 ca-certificates \
