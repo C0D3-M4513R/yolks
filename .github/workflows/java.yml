@@ -31,6 +31,7 @@ jobs:
           - 21
           - 21-graalvm
           - 22
+          - 25
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-qemu-action@v3

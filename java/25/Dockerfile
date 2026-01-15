@@ -1,10 +1,12 @@
-FROM        --platform=$TARGETOS/$TARGETARCH ibm-semeru-runtimes:open-16-jdk
+FROM        --platform=$TARGETOS/$TARGETARCH eclipse-temurin:25-jdk-noble
 
-LABEL       author="Michael Parker" maintainer="parker@pterodactyl.io"
+LABEL       author="Michael Parker" maintainer="parker@pelican.dev"
+
+LABEL       org.opencontainers.image.source="https://github.com/pterodactyl/yolks"
+LABEL       org.opencontainers.image.licenses=MIT
 
 RUN         apt update -y \
             && apt install -y \
-                btrfs-progs \
                 curl \
                 lsof \
                 ca-certificates \
@@ -16,10 +18,9 @@ RUN         apt update -y \
                 tzdata \
                 iproute2 \
                 libfreetype6 \
-                redis-tools \
                 tini \
-				zip \
-				unzip \
+                zip \
+                unzip \
                 jq
 
 ## Setup user and working directory
@@ -34,4 +35,3 @@ COPY        --chown=container:container ./../entrypoint.sh /entrypoint.sh
 RUN         chmod +x /entrypoint.sh
 ENTRYPOINT    ["/usr/bin/tini", "-g", "--"]
 CMD         ["/entrypoint.sh"]
-

@@ -16,6 +16,7 @@ RUN         apt update -y \
                 tzdata \
                 iproute2 \
                 libfreetype6 \
+                redis-tools \
                 tini \
 				zip \
 				unzip \
